@@ -1,17 +1,21 @@
- body{
-	background-color: #337ab7;
-} 
+ img{
+	max-width: 100%;
+}
+
+/* body{
+	background-color: blue;
+} */
 
 h1{
 	color: #00FF00;
 	font-size: 60px;
 }
-
 #board{
 	max-width: 640px;
 	min-width: 320px;
-	float: none; /* Override bootstrap */
+	/* float: none; Override bootstrap */
 	margin: auto;
+	margin-bottom:  20px;
 }
 
 .square{

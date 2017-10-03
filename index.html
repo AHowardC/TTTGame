@@ -14,10 +14,20 @@
 			<h1>Tic Tac Toe</h1>
 		</div>
 		<div class="row">
+			<div id="player-selections">
+				<div>
+					<input type="text" placeholder="Enter your name" id="player-name" />
+				</div>
+				<button id="one-player" class="btn btn-primary">One player game</button>
+				<button id="two-player" class="btn btn-primary">Two player game</button>
+			</div>
 			<div id="message" class="col-sm-12">
 				<!-- Messages for the user will go inside this div -->
 			</div>
-			<div id="board" class="col-sm-12">
+			<div class="col-sm-2">
+				Player 1 score: <span class="player1-score">0</span>
+			</div>
+			<div id="board" class="col-sm-8"> <!-- This is the size of the board. How to make the board size vary using JS? -->
 <!-- 
 				All 3 rows, will have 3 buttons.
 				Each row will be called a "board-row"
@@ -38,10 +48,17 @@
 					<button id="A3" class="square">-</button>
 					<button id="B3" class="square">-</button>
 					<button id="C3" class="square">-</button>
+
 				</div>
 			</div>
+			<div class="col-sm-2">
+				Player 2 score: <span class="player2-score">0</span>
+			</div>			
+			<div id="reset-button"><!-- Put reset button in here when ready --></div>
 		</div>
 	</div>
+
 	<script type="text/javascript" src="scripts.js"></script>
+
 </body>
 </html>

@@ -1,8 +1,16 @@
 // GLOBALS
 // init whosTurn as player 1s turn
 var whosTurn = 1;
+// var players = {
+// 	playerOne: [],
+// 	playerTwo: []
+// }
+var numPlayers = 1;
+var name = "Icognito";
 var player1Squares = [];
 var player2Squares = [];
+var player1Img = '<img src="harry.jpg" />';
+var player2Img = '<img src="ron.jpg" />';
 var winningCombos = [
 	['A1','B1','C1'], //ROW 1
 	['A2','B2','C2'], //ROW 2
@@ -13,18 +21,22 @@ var winningCombos = [
 	['A1','B2','C3'], //DIAG 1
 	['A3','B2','C1'] //DIAG 2
 ];
-var gameOver = false;
+var gameOver = true;
+var scores = [
+	0,
+	0
+]
+// var a;
 
 // Two things happen when someone clicks.
 // 1. We change the DOM (for the user).
 // 2. We change the vars for JS.
-
 var markSquare = function(squareClicked){
 	// console.log(squareClicked.innerHTML);
 	if(squareClicked.innerHTML !== '-'){
 		document.getElementById('message').innerHTML = "Sorry, that square is taken."
 	}else if(whosTurn === 1){
-		squareClicked.innerHTML = 'X';
+		squareClicked.innerHTML = player1Img; //'X';
 		whosTurn = 2;
 		player1Squares.push(squareClicked.id);
 		console.log(player1Squares)
@@ -32,12 +44,17 @@ var markSquare = function(squareClicked){
 		if(player1Squares.length >= 3){
 			checkWin(player1Squares,1);
 		}
+		if((numPlayers == 1) && (!gameOver)){
+			computerMove();
+		}
 	}else{
-		squareClicked.innerHTML = 'O';
+		squareClicked.innerHTML = player2Img;  //'O';
 		whosTurn = 1;
 		player2Squares.push(squareClicked.id);
-		document.getElementById('message').innerHTML = ""
-		checkWin(player2Squares,2);
+		document.getElementById('message').innerHTML = "It's X's turn"
+		if(player2Squares.length >= 3){
+			checkWin(player2Squares,2);
+		}		
 	}
 	// checkWin();
 }
@@ -50,11 +67,16 @@ function computerMove(){
 	var sqaureFound = false;
 	while(!sqaureFound){
 		rand = Math.floor(Math.random() * 9);
-		console.log(takenSquares)
-		if(takenSquares.indexOf(squares[rand].id) == -1){
-			// square not taken. Take it.
+		var isTaken = squares[rand].innerHTML;
+		if(isTaken === '-'){
 			sqaureFound = true;
 		}
+
+		// console.log(takenSquares)
+		// if(takenSquares.indexOf(squares[rand].id) == -1){
+		// 	// square not taken. Take it.
+		// 	sqaureFound = true;
+		// }
 	}
 	markSquare(squares[rand]);
 }
@@ -70,7 +92,7 @@ function checkWin(currentPlayerSquares,whoJustMarked){
 		// INNER LOOP - check a square inside a winning comnbination
 		for(let j = 0; j < winningCombos[i].length; j++){
 			var winningSquare = winningCombos[i][j]
-			if(currentPlayerSquares.indexOf(winningSquare) !== -1){
+			if(currentPlayerSquares.indexOf(winningSquare) >= 0 ){
 				// THE Square belongs to the player. We do not care where.
 				squareCount++;
 			}
@@ -86,8 +108,15 @@ function checkWin(currentPlayerSquares,whoJustMarked){
 
 function endGame(winningCombo,whoJustMarked){
 	// WINNER WINNER CHICKEN DINNER
-	console.log(`Player ${whoJustMarked} won the game`);
-	document.getElementById('message').innerHTML = `Congrats to player ${whoJustMarked}!`
+	if(whoJustMarked === 1){
+		var nameToShow = name;
+		scores[0]++;
+	}else{
+		var nameToShow = 'Player 2';
+		scores[1]++;
+	}
+	console.log(`${nameToShow} won the game`);
+	document.getElementById('message').innerHTML = `Congrats to ${nameToShow}!`
 	gameOver = true;
 	// Loop through the winning combo, and add a class.	
 	for(let i = 0; i < winningCombo.length; i++){
@@ -95,6 +124,31 @@ function endGame(winningCombo,whoJustMarked){
 		console.dir(theSquare);
 		theSquare.className += ' winning-square';
 	}
+	document.getElementById('reset-button').innerHTML = '<button id="reset" class="btn btn-lg btn-success">Reset Game</button>';
+	var resetButton = document.getElementById('reset');
+	resetButton.addEventListener('click', reset);
+	// The game is over. The scores have been updated. Now update the DOM with the new score
+	document.getElementsByClassName('player1-score')[0].innerHTML = scores[0];
+	document.getElementsByClassName('player2-score')[0].innerHTML = scores[1];
+}
+
+function reset(){
+	// a = "I'm local";
+	// console.log("I made a new button called rset. And the user just clicked on it.")
+	// In order to reset the game...
+	// 1. Clear/reset out all arrays.
+	player1Squares = [];
+	player2Squares = [];
+	// 2. Reset the DOM to it's former glory.
+	for(let i = 0; i < squares.length; i++){
+		squares[i].innerHTML = '-';
+		squares[i].className = 'square';
+	}
+	// 3. Reset the gameOver bool
+	gameOver = false;
+	// 4. Reset any counters.
+	// 5. Winning class needs to be wiped
+
 }
 
 // console.log("Sanity check...")
@@ -108,6 +162,9 @@ function endGame(winningCombo,whoJustMarked){
 
 // 6. Highlight the winning sqaures
 // 7. Game must stop if someone won (i.e., can't keep clicking)
+
+// var test = document.getElementsByTagName('button');
+// console.log(test);
 
 // squares is an array with 9 objects. Each object is the JS representation of the HTML tag.
 var squares = document.getElementsByClassName('square');
@@ -130,11 +187,40 @@ for (let i = 0; i < squares.length; i++){
 		// in JS, ! = not, !gameOver means not gameOver, or gameOver == false
 		if(!gameOver){
 			markSquare(this);
+		}else{
+			console.log("Haha, you cant play.")
 		}
 	});
 }
 
+document.getElementById('one-player').addEventListener('click', function(event){
+	// console.log("User has chosen a one player game")
+	gameOver = false;
+	numPlayers = 1;
+	var nameBox = document.getElementById('player-name');
+	if(nameBox.value !== ""){
+		name = nameBox.value
+	}
+});
 
+document.getElementById('two-player').addEventListener('click', function(event){
+	// console.log("User has chosen a two player game");
+	gameOver = false;
+	numPlayers = 2;
+	var nameBox = document.getElementById('player-name');
+	if(nameBox.value !== ""){
+		name = nameBox.value
+	}	
+});
+
+// AI Order funcitonality 
+// 1 if can select winningCombos[i] {then win}
+// 2 if can not {block other players from winningCombos[i]}
+// 3 if i can trap or winningCombos[i] {win}
+// 4 if i can get good 2nd
+// 5 take best avail
+
+// computerMove();
 // function someoneClicked(event){
 // 		// console.log(this);
 // 		// call the markSquare funciton and pass the square user clicked on.
